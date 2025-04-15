@@ -20,20 +20,27 @@ trap 'rm -r -- "$TMP"' EXIT
 
 cp playlog.json "$TMP/"
 
-echo "<html><head>
-  <style>
-  table {
-    display: inline-block;
-    margin-right: 10px;
-    vertical-align: top;
-    border: 1px solid black;
-    text-align: right
-  }
-  td, th {
-    border: 1px solid black;
-    padding: 8px;
-  }
-  </style>
+echo "
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="author" content="Ethan Cheng">
+
+	<style>
+	table {
+		display: inline-block;
+		margin-right: 10px;
+		vertical-align: top;
+		border: 1px solid black;
+		text-align: right
+	}
+	td, th {
+		border: 1px solid black;
+		padding: 8px;
+	}
+	</style>
 </head>
 <body>"
 
@@ -44,7 +51,8 @@ cat "$TMP/playlog.json" | jq --slurpfile songs songs.json -r '
 	.musicId as $song_id |
 	. + ($songs[][] | select(.song_id == $song_id)) |
 
-	"<p><strong>\(.name)</strong><br>
+	"<p><img width=\"190\" height=\"190\" src=\"\(.musicId).png\" loading=\"lazy\"></p>
+	<p><strong>\(.name)</strong><br>
 	\(.artist)</p>" +
 	"<p>" +
 	(.level | sub("MAIMAI_LEVEL_"; "")) +
@@ -74,5 +82,3 @@ cat "$TMP/playlog.json" | jq --slurpfile songs songs.json -r '
 	'
 
 echo "</body></html>"
-
-#(.level | sub("MAIMAI_LEVEL_"; ""; "g")) +
