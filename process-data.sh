@@ -44,16 +44,18 @@ cat "$TMP/playlog.json" | jq --slurpfile songs songs.json -r '
 	.musicId as $song_id |
 	. + ($songs[][] | select(.song_id == $song_id)) |
 
-	"<strong>\(.name)</strong><br>
-	\(.artist)<br>" +
+	"<p><strong>\(.name)</strong><br>
+	\(.artist)</p>" +
+	"<p>" +
 	(.level | sub("MAIMAI_LEVEL_"; "")) +
 	" LV " +
 	(.level as $level | .charts[] | select(.difficulty == ($level | sub("MAIMAI_LEVEL_"; "") | ascii_downcase )) | .internal_level | tostring) +
-	"<br>" +
-	"<strong>" + 
+	"</p>" +
+	"<p><strong>" + 
 	(.achievement / 10000 | tostring) + "% " +
 	(.scoreRank | sub("MAIMAI_SCORE_RANK_"; ""; "g") | sub("_PLUS"; "+"; "g")) +
-	"</strong><br> 
+	"</strong></p> 
+	<p>
 	<table class=\"judgement-table\">
 		<tr> <td>Critical<br>Perfect</td> <td>\(.judgeCriticalPerfect)</td> </tr>
 		<tr> <td>Perfect</td> <td>\(.judgePerfect)</td> </tr>
@@ -65,8 +67,10 @@ cat "$TMP/playlog.json" | jq --slurpfile songs songs.json -r '
 		<tr> <td>Max<br>Combo</td> <td>\(.maxCombo)</td> </tr>
 		<tr> <td>Fast</td> <td>\(.fastCount)</td> </tr>
 		<tr> <td>Late</td> <td>\(.lateCount)</td> </tr>
-	</table><br><br>
-	Played on: \(.userPlayDate)<hr>"
+	</table></p>
+	<p>
+	Played on: \(.userPlayDate)<hr>
+	</p>"
 	'
 
 echo "</body></html>"
