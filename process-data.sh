@@ -42,7 +42,10 @@ echo "
 	}
 	</style>
 </head>
-<body>"
+<body>
+<p>Last updated: $(date -Iseconds)</p>
+<hr>
+"
 
 cat "$TMP/playlog.json" | jq --slurpfile songs songs.json -r '
 	.playlog |
