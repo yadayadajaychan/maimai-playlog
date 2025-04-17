@@ -24,5 +24,3 @@ API="https://www.solips.app/maimai/profile?_data=routes%2Fmaimai.profile"
 source .env
 curl -c "$TMP/cookies.txt" -d "accessCode=$ACCESS_CODE&requestType=getUserApiId" -sS "$API" >/dev/null
 curl -b "$TMP/cookies.txt" -sS "$API" | jq
-
-#curl -b "$TMP/cookies.txt" -d "playlogApiId=&requestType=getPlaylogDetail&accessCode=$ACCESS_CODE" -sS "$API"
