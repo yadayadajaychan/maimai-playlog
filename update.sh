@@ -24,6 +24,8 @@ source .env
 if [ -e "$PLAYLOG" ]
 then
 	cp "$PLAYLOG" "$PLAYLOG.$(date "+%s")"
+else
+	touch "$PLAYLOG"
 fi
 
 ./get-playlog.sh > "$PLAYLOG.new"
