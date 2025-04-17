@@ -22,4 +22,4 @@ while read playlogApiId
 do
 	curl -d "playlogApiId=$playlogApiId&requestType=getPlaylogDetail&accessCode=$ACCESS_CODE" -sS "$API"
 	sleep 10
-done | jq -s '.'
+done | jq -s '{"playlogDetail": .}'
