@@ -15,10 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-TMP=$(mktemp -d)
-trap 'rm -r -- "$TMP"' EXIT
-
-cp playlog.json "$TMP/"
+if [ -z "$1" ]
+then
+	echo "usage: $0 <playlog>" >&2
+	exit 1
+fi
 
 echo "
 <!DOCTYPE html>
@@ -47,7 +48,7 @@ echo "
 <hr>
 "
 
-cat "$TMP/playlog.json" | jq --slurpfile songs songs.json -r '
+cat "$1" | jq --slurpfile songs songs.json -r '
 	.playlog |
 	.[] |
 	.info + .judge |
