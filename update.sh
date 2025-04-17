@@ -39,3 +39,10 @@ cat "$PLAYLOG" "$PLAYLOG.new" | jq -s '
 
 mv "$PLAYLOG.tmp" "$PLAYLOG"
 rm "$PLAYLOG.new"
+
+# =======================
+# Create static html file
+# =======================
+
+./process-data.sh "$PLAYLOG" > "$INDEX_HTML.tmp"
+mv "$INDEX_HTML.tmp" "$INDEX_HTML"
