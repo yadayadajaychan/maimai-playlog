@@ -17,6 +17,16 @@
 
 source .env
 
+# ===========================
+# Check environment variables
+# ===========================
+
+if [ -z "$ACCESS_CODE" ] || [ -z "$PLAYLOG" ] || [ -z "$INDEX_HTML" ]
+then
+	echo missing environment variable >&2
+	exit 1
+fi
+
 # ==============
 # Update playlog
 # ==============
