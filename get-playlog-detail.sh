@@ -21,5 +21,5 @@ source .env
 while read playlogApiId
 do
 	curl -d "playlogApiId=$playlogApiId&requestType=getPlaylogDetail&accessCode=$ACCESS_CODE" -sS "$API"
-	sleep 10
+	sleep 5
 done | jq '.playlogDetail' | jq -s '{"playlogDetail": .}'
