@@ -75,12 +75,10 @@ else
 	touch "$PLAYLOG_DETAIL"
 fi
 
-cat "$PLAYLOG" | jq '.playlog[].info.userPlayDate' > "$TMP/playlog-dates"
-cat "$PLAYLOG_DETAIL" | jq '.playlogDetail[].info.userPlayDate' > "$TMP/playlog-detail-dates"
+cat "$PLAYLOG" | jq '.playlog[].info.userPlayDate' | sort > "$TMP/playlog-dates"
+cat "$PLAYLOG_DETAIL" | jq '.playlogDetail[].info.userPlayDate' | sort > "$TMP/playlog-detail-dates"
 
-diff "$TMP/playlog-dates" "$TMP/playlog-detail-dates" | \
-	grep -F '<' | \
-	sed 's/^< //' | \
+comm -23 "$TMP/playlog-dates" "$TMP/playlog-detail-dates" | \
 	while read date
 	do
 		cat "$PLAYLOG" | jq ".playlog[] |
