@@ -22,11 +22,18 @@ source .env
 # Check environment variables
 # ===========================
 
-if [ -z "$ACCESS_CODE" ] || [ -z "$PLAYLOG" ] || [ -z "$INDEX_HTML" ]
+if [ -z "$ACCESS_CODE" ] || [ -z "$PLAYLOG" ] || [ -z "$INDEX_HTML" ] || [ -z "$PLAYLOG_DETAIL" ]
 then
 	echo missing environment variable >&2
 	exit 1
 fi
+
+# ==========================
+# Create temporary directory
+# ==========================
+
+TMP=$(mktemp -d)
+trap 'rm -r -- "$TMP"' EXIT
 
 # ==============
 # Update playlog
@@ -39,21 +46,54 @@ else
 	touch "$PLAYLOG"
 fi
 
-./get-playlog.sh > "$PLAYLOG.new"
+./get-playlog.sh > "$TMP/$PLAYLOG.new"
 
-cat "$PLAYLOG" "$PLAYLOG.new" | jq -s '
+cat "$PLAYLOG" "$TMP/$PLAYLOG.new" | jq -s '
 	.[0].playlog + .[1].playlog | 
 	group_by(.info.userPlayDate) |
 	map(.[0]) |
 	reverse |
-	{"playlog": .}' > "$PLAYLOG.tmp"
+	{"playlog": .}' > "$TMP/$PLAYLOG.tmp"
 
-mv "$PLAYLOG.tmp" "$PLAYLOG"
-rm "$PLAYLOG.new"
+mv "$TMP/$PLAYLOG.tmp" "$PLAYLOG"
 
 # =======================
 # Create static html file
 # =======================
 
-./process-data.sh "$PLAYLOG" > "$INDEX_HTML.tmp"
-mv "$INDEX_HTML.tmp" "$INDEX_HTML"
+./process-data.sh "$PLAYLOG" > "$TMP/index.html.tmp"
+mv "$TMP/index.html.tmp" "$INDEX_HTML"
+
+# =======================
+# Update detailed playlog
+# =======================
+
+if [ -e "$PLAYLOG_DETAIL" ]
+then
+	cp "$PLAYLOG_DETAIL" "$PLAYLOG_DETAIL.$(date "+%s")"
+else
+	touch "$PLAYLOG_DETAIL"
+fi
+
+cat "$PLAYLOG" | jq '.playlog[].info.userPlayDate' > "$TMP/playlog-dates"
+cat "$PLAYLOG_DETAIL" | jq '.playlogDetail[].info.userPlayDate' > "$TMP/playlog-detail-dates"
+
+diff "$TMP/playlog-dates" "$TMP/playlog-detail-dates" | \
+	grep -F '<' | \
+	sed 's/^< //' | \
+	while read date
+	do
+		cat "$PLAYLOG" | jq ".playlog[] |
+				select(.info.userPlayDate == $date) |
+				.playlogApiId"
+	done | sed 's/"//g' | \
+	./get-playlog-detail.sh > "$TMP/$PLAYLOG_DETAIL.new"
+
+cat "$PLAYLOG_DETAIL" "$TMP/$PLAYLOG_DETAIL.new" | jq -s '
+	.[0].playlogDetail + .[1].playlogDetail |
+	group_by(.info.userPlayDate) |
+	map(.[0]) |
+	reverse |
+	{"playlogDetail": .}' > "$TMP/$PLAYLOG_DETAIL.tmp"
+
+mv "$TMP/$PLAYLOG_DETAIL.tmp" "$PLAYLOG_DETAIL"
