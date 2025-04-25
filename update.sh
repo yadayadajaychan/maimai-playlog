@@ -61,8 +61,8 @@ mv "$TMP/$PLAYLOG.tmp" "$PLAYLOG"
 # Create static html file
 # =======================
 
-./process-data.sh "$PLAYLOG" > "$TMP/index.html.tmp"
-mv "$TMP/index.html.tmp" "$INDEX_HTML"
+#./process-data.sh "$PLAYLOG" > "$TMP/index.html.tmp"
+#mv "$TMP/index.html.tmp" "$INDEX_HTML"
 
 # =======================
 # Update detailed playlog
